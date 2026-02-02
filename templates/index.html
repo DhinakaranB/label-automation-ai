@@ -57,6 +57,24 @@
                 </div>
             </div>
             <div id="comparisonContent" class="view-content">
+                <div class="pdf-controls">
+                    <button class="control-btn" onclick="changePage(-1)">Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button class="control-btn" onclick="changePage(1)">Next</button>
+                    <button class="control-btn" onclick="zoomOut()">Zoom Out</button>
+                    <select id="zoomSelect" class="download-select" onchange="setZoom(parseFloat(this.value))" style="min-width: 100px;">
+                        <option value="0.5">50%</option>
+                        <option value="0.75">75%</option>
+                        <option value="1.0">100%</option>
+                        <option value="1.25">125%</option>
+                        <option value="1.5" selected>150%</option>
+                        <option value="1.75">175%</option>
+                        <option value="2.0">200%</option>
+                        <option value="2.5">250%</option>
+                        <option value="3.0">300%</option>
+                    </select>
+                    <button class="control-btn" onclick="zoomIn()">Zoom In</button>
+                </div>
                 <div class="pdf-comparison-panels">
                     <div class="pdf-panel">
                         <h4>New Template</h4>

@@ -8,6 +8,8 @@ let currentPage = 1;
 let totalPages = 1;
 let oldPdfDoc = null;
 let newPdfDoc = null;
+let currentZoom = 1.5;
+let isProcessing = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     const newTemplateInput = document.getElementById('newTemplate');
@@ -65,10 +67,11 @@ function checkFilesReady() {
 }
 
 function compareFiles() {
-    if (!newTemplateFile || !oldTemplateFile) {
-        alert('Please select both files');
+    if (!newTemplateFile || !oldTemplateFile || isProcessing) {
         return;
     }
+    
+    isProcessing = true;
     
     const formData = new FormData();
     formData.append('new_template', newTemplateFile);
@@ -83,6 +86,7 @@ function compareFiles() {
     .then(response => response.json())
     .then(data => {
         showLoading(false);
+        isProcessing = false;
         
         if (data.success) {
             displayResults(data);
@@ -93,6 +97,7 @@ function compareFiles() {
     })
     .catch(error => {
         showLoading(false);
+        isProcessing = false;
         alert('Error processing files: ' + error.message);
     });
 }
@@ -101,12 +106,17 @@ function displayResults(data) {
     const resultSection = document.getElementById('resultSection');
     const downloadOptions = document.getElementById('downloadOptions');
     
+    // Reset state for consistent rendering
+    resetPdfState();
+    
     comparisonData = data.comparison;
     oldTemplateText = data.old_text || '';
     newTemplateText = data.new_text || '';
     
-    // Load PDFs for side-by-side view
-    loadPDFs();
+    // Small delay to ensure canvas recreation is complete
+    setTimeout(() => {
+        loadPDFs();
+    }, 100);
     
     resultSection.style.display = 'block';
     downloadOptions.style.display = 'flex';
@@ -122,6 +132,31 @@ function downloadFile() {
 function showLoading(show) {
     const loading = document.getElementById('loading');
     loading.style.display = show ? 'flex' : 'none';
+}
+
+function resetPdfState() {
+    currentPage = 1;
+    totalPages = 1;
+    oldPdfDoc = null;
+    newPdfDoc = null;
+    currentZoom = 1.5;
+    
+    const newCanvas = document.getElementById('newPdfCanvas');
+    const oldCanvas = document.getElementById('oldPdfCanvas');
+    
+    if (newCanvas) {
+        const ctx = newCanvas.getContext('2d');
+        ctx.clearRect(0, 0, newCanvas.width, newCanvas.height);
+        newCanvas.width = 0;
+        newCanvas.height = 0;
+    }
+    
+    if (oldCanvas) {
+        const ctx = oldCanvas.getContext('2d');
+        ctx.clearRect(0, 0, oldCanvas.width, oldCanvas.height);
+        oldCanvas.width = 0;
+        oldCanvas.height = 0;
+    }
 }
 
 function loadPDFs() {
@@ -155,14 +190,22 @@ function renderPage(pageNum) {
         newPdfDoc.getPage(pageNum).then(function(page) {
             const canvas = document.getElementById('newPdfCanvas');
             const context = canvas.getContext('2d');
-            const viewport = page.getViewport({scale: 0.8});
+            const viewport = page.getViewport({scale: currentZoom});
             
-            canvas.height = viewport.height;
+            context.clearRect(0, 0, canvas.width, canvas.height);
             canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
             canvas.style.width = '100%';
             canvas.style.height = 'auto';
+            canvas.style.maxWidth = '100%';
             
-            page.render({canvasContext: context, viewport: viewport});
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            
+            page.render(renderContext);
         });
     }
     
@@ -170,20 +213,26 @@ function renderPage(pageNum) {
         oldPdfDoc.getPage(pageNum).then(function(page) {
             const canvas = document.getElementById('oldPdfCanvas');
             const context = canvas.getContext('2d');
-            const viewport = page.getViewport({scale: 0.8});
+            const viewport = page.getViewport({scale: currentZoom});
             
-            canvas.height = viewport.height;
+            context.clearRect(0, 0, canvas.width, canvas.height);
             canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
             canvas.style.width = '100%';
             canvas.style.height = 'auto';
+            canvas.style.maxWidth = '100%';
             
-            page.render({canvasContext: context, viewport: viewport});
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            
+            page.render(renderContext);
         });
     }
     
-    document.getElementById('pageInfo').textContent = `Page ${pageNum} of ${totalPages}`;
-    document.getElementById('prevPage').disabled = pageNum <= 1;
-    document.getElementById('nextPage').disabled = pageNum >= totalPages;
+    updatePageInfo();
 }
 
 function changePage(delta) {
@@ -191,5 +240,45 @@ function changePage(delta) {
     if (newPage >= 1 && newPage <= totalPages) {
         currentPage = newPage;
         renderPage(currentPage);
+    }
+}
+
+function zoomIn() {
+    if (currentZoom < 3.0) {
+        currentZoom += 0.25;
+        renderPage(currentPage);
+        updateZoomInfo();
+    }
+}
+
+function zoomOut() {
+    if (currentZoom > 0.5) {
+        currentZoom -= 0.25;
+        renderPage(currentPage);
+        updateZoomInfo();
+    }
+}
+
+function updatePageInfo() {
+    const pageInfo = document.getElementById('pageInfo');
+    if (pageInfo) {
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+}
+
+function setZoom(zoomLevel) {
+    currentZoom = zoomLevel;
+    renderPage(currentPage);
+    updateZoomInfo();
+}
+
+function updateZoomInfo() {
+    const zoomInfo = document.getElementById('zoomInfo');
+    const zoomSelect = document.getElementById('zoomSelect');
+    if (zoomInfo) {
+        zoomInfo.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+    if (zoomSelect) {
+        zoomSelect.value = currentZoom;
     }
 }
