@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label Automate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Label Automation Pdf Generator</h1>
+        
+        <div class="upload-section">
+            <div class="upload-panel left-panel">
+                <h2>New Tag Template</h2>
+                <div class="upload-area" id="newTemplateArea">
+                    <input type="file" id="newTemplate" accept=".pdf" hidden>
+                    <label for="newTemplate" class="upload-label">
+                        <div class="upload-content">
+                            <span class="upload-icon">📄</span>
+                            <p>Click to upload new template PDF</p>
+                        </div>
+                    </label>
+                    <div class="file-info" id="newFileInfo"></div>
+                </div>
+            </div>
+            
+            <div class="upload-panel right-panel">
+                <h2>Old Tag Template</h2>
+                <div class="upload-area" id="oldTemplateArea">
+                    <input type="file" id="oldTemplate" accept=".pdf" hidden>
+                    <label for="oldTemplate" class="upload-label">
+                        <div class="upload-content">
+                            <span class="upload-icon">📄</span>
+                            <p>Click to upload old template PDF</p>
+                        </div>
+                    </label>
+                    <div class="file-info" id="oldFileInfo"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-section">
+            <button id="compareBtn" class="compare-btn" disabled>Compare & Generate</button>
+        </div>
+        
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-header">
+                <h3>PDF Comparison Results</h3>
+                <div class="download-options" id="downloadOptions" style="display: none;">
+                    <select id="downloadFormat" class="download-select">
+                        <option value="">Select Download Format</option>
+                        <option value="pdf">Download PDF</option>
+                        <option value="svg">Download SVG</option>
+                    </select>
+                    <button id="downloadBtn" class="download-btn" disabled>Download</button>
+                </div>
+            </div>
+            <div id="comparisonContent" class="view-content">
+                <div class="pdf-comparison-panels">
+                    <div class="pdf-panel">
+                        <h4>Old Template</h4>
+                        <canvas id="oldPdfCanvas" class="pdf-canvas"></canvas>
+                    </div>
+                    <div class="pdf-panel">
+                        <h4>New Template</h4>
+                        <canvas id="newPdfCanvas" class="pdf-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing files...</p>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>© 2025 Copyright by Indsys Holdings – All rights reserved.</p>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
