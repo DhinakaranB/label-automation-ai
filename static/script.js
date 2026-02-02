@@ -126,16 +126,8 @@ function showLoading(show) {
 
 function loadPDFs() {
     if (oldTemplateFile && newTemplateFile) {
-        const oldFileReader = new FileReader();
         const newFileReader = new FileReader();
-        
-        oldFileReader.onload = function(e) {
-            pdfjsLib.getDocument(e.target.result).promise.then(function(pdf) {
-                oldPdfDoc = pdf;
-                totalPages = Math.max(pdf.numPages, totalPages);
-                renderPage(currentPage);
-            });
-        };
+        const oldFileReader = new FileReader();
         
         newFileReader.onload = function(e) {
             pdfjsLib.getDocument(e.target.result).promise.then(function(pdf) {
@@ -145,15 +137,23 @@ function loadPDFs() {
             });
         };
         
-        oldFileReader.readAsArrayBuffer(oldTemplateFile);
+        oldFileReader.onload = function(e) {
+            pdfjsLib.getDocument(e.target.result).promise.then(function(pdf) {
+                oldPdfDoc = pdf;
+                totalPages = Math.max(pdf.numPages, totalPages);
+                renderPage(currentPage);
+            });
+        };
+        
         newFileReader.readAsArrayBuffer(newTemplateFile);
+        oldFileReader.readAsArrayBuffer(oldTemplateFile);
     }
 }
 
 function renderPage(pageNum) {
-    if (oldPdfDoc && pageNum <= oldPdfDoc.numPages) {
-        oldPdfDoc.getPage(pageNum).then(function(page) {
-            const canvas = document.getElementById('oldPdfCanvas');
+    if (newPdfDoc && pageNum <= newPdfDoc.numPages) {
+        newPdfDoc.getPage(pageNum).then(function(page) {
+            const canvas = document.getElementById('newPdfCanvas');
             const context = canvas.getContext('2d');
             const viewport = page.getViewport({scale: 0.8});
             
@@ -166,9 +166,9 @@ function renderPage(pageNum) {
         });
     }
     
-    if (newPdfDoc && pageNum <= newPdfDoc.numPages) {
-        newPdfDoc.getPage(pageNum).then(function(page) {
-            const canvas = document.getElementById('newPdfCanvas');
+    if (oldPdfDoc && pageNum <= oldPdfDoc.numPages) {
+        oldPdfDoc.getPage(pageNum).then(function(page) {
+            const canvas = document.getElementById('oldPdfCanvas');
             const context = canvas.getContext('2d');
             const viewport = page.getViewport({scale: 0.8});
             
