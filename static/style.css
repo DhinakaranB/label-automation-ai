@@ -178,16 +178,6 @@ h1 {
     background: #27ae60;
     color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.download-btn {
-    background: #27ae60;
-    color: white;
-    border: none;
     padding: 10px 25px;
     border-radius: 6px;
     font-size: 14.7px;
@@ -406,21 +396,66 @@ h1 {
 }
 
 .highlight-diff {
-    background: #fff3cd;
-    padding: 2px 4px;
-    border-radius: 2px;
+    background: #ffeb3b !important;
+    color: #000 !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 2px solid #ff9800;
 }
 
 .highlight-new {
-    background: #d4edda;
-    padding: 2px 4px;
-    border-radius: 2px;
+    background: #4caf50 !important;
+    color: #fff !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 2px solid #2e7d32;
 }
 
 .highlight-old {
-    background: #f8d7da;
-    padding: 2px 4px;
-    border-radius: 2px;
+    background: #f44336 !important;
+    color: #fff !important;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-decoration: line-through;
+    border: 2px solid #c62828;
+}
+
+.diff-container {
+    border: 3px solid #ffeb3b;
+    background: rgba(255, 235, 59, 0.1);
+    border-radius: 8px;
+    margin: 15px 0;
+    padding: 10px;
+}
+
+.diff-line {
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.diff-line.added {
+    background: #4caf50;
+    color: white;
+    border-left: 5px solid #2e7d32;
+}
+
+.diff-line.removed {
+    background: #f44336;
+    color: white;
+    border-left: 5px solid #c62828;
+    text-decoration: line-through;
+}
+
+.diff-line.modified {
+    background: #ffeb3b;
+    color: black;
+    border-left: 5px solid #ff9800;
 }
 
 @media (max-width: 768px) {
